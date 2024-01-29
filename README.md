@@ -1,5 +1,12 @@
 # AngularLab
 
+## Run on Docker Compose
+
+```base
+docker compose up
+docker compose up --build
+```
+
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 16.2.9.
 
 ## Development server
