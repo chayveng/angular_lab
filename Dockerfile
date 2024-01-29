@@ -1,35 +1,21 @@
-# Use an official Node.js runtime as the base image for build stage
-FROM node:latest AS build
+# Stage 1: Build Angular app
+FROM node:16 AS builder
 
-# Set the working directory in the container
 WORKDIR /app
 
-# Copy package.json and package-lock.json to the container
 COPY package*.json ./
 
-# Install dependencies
 RUN npm install
 
-# Copy the entire project to the container
 COPY . .
 
-# Build the Angular app in production mode
 RUN npm run build --prod
 
-# Use a lightweight Node.js image for the final image
-FROM node:alpine
+# Stage 2: Serve Angular app with Nginx
+FROM nginx:alpine
 
-# Install http-server to serve Angular app
-RUN npm install -g http-server
+COPY --from=builder /app/dist/* /usr/share/nginx/html/
 
-# Set the working directory in the container
-WORKDIR /app
+EXPOSE 80
 
-# Copy the built Angular app from the build stage to the final image
-COPY --from=build /app/dist/my-angular-app .
-
-# Expose the port the app runs on
-EXPOSE 8080
-
-# Command to serve Angular app using http-server
-CMD ["http-server", "-p", "8080"]
+CMD ["nginx", "-g", "daemon off;"]
